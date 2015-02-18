@@ -816,6 +816,11 @@ class Guake(SimpleGladeApp):
         """
         self.window.hide() # Don't use hide_all here!
 
+    def hide_all_bars(self):
+        self.resizer.hide()
+        if not self.client.get_bool(KEY('general/toolbar_visible_in_fullscreen')):
+            self.toolbar.hide()
+
     def get_final_window_rect(self):
         """Gets the final size of the main window of guake. The height
         is the window_height property, width is window_width and the
@@ -825,14 +830,18 @@ class Guake(SimpleGladeApp):
         height = self.client.get_int(KEY('/general/window_height'))
         width = 100
         halignment = self.client.get_int(KEY('/general/window_halignment'))
-
+        
+        self.hide_all_bars()
+        
         # get the rectangle just from the first/default monitor in the
         # future we might create a field to select which monitor you
         # wanna use
         window_rect = screen.get_monitor_geometry(0)
-        total_width = window_rect.width
+        window_rect_second_monitor = screen.get_monitor_geometry(1)
+        total_width = window_rect.width + window_rect_second_monitor.width
         window_rect.height = window_rect.height * height / 100
-        window_rect.width = window_rect.width * width / 100
+        #window_rect.width = window_rect.width * width / 100
+        window_rect.width = total_width * width / 100
 
         if width < total_width:
             if halignment == ALIGN_CENTER:
